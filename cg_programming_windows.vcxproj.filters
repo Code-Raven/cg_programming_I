@@ -25,10 +25,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="BasicVertexShader.vertexshader">
+    <None Include="BasicFragmentShader.fragmentshader">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="BasicFragmentShader.fragmentshader">
+    <None Include="BasicVertexShader.vertexshader">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
