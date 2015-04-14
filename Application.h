@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <memory.h>
-
 //GLEW provides the function pointers we need to access the latest features in openGL.
 #include <GL/glew.h>    //Must be included before gl.h and glfw.h.
 
@@ -10,11 +7,9 @@
 //GLM provides openGL mathematics.
 #include <glm/glm.hpp>
 
-extern GLint shaderStatus;
-extern bool activeRef;
-
 //Standard Headers…
 #include <stdio.h>
+#include <memory.h>
 #include <stdlib.h>
 #include <cassert>
 #include <iostream>
@@ -36,12 +31,12 @@ using namespace std; //If we want to print stuff
 #define ANTIALIASING 4  //nx antialiasing
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 768
+#define GLFW_FAIL 0 
 
 //External Globals…
 extern GLFWwindow* window;
 extern GLint shaderStatus;
-
-#pragma once
+extern bool activeRef;
 
 //int Load();
 //void Update();
