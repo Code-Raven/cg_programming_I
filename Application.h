@@ -39,9 +39,3 @@ using namespace std; //If we want to print stuff
 extern GLFWwindow* window;
 extern GLint shaderStatus;
 extern bool activeRef;
-
-//int Load();
-//void Update();
-//void Render();
-
-//void CheckShaderStatus(GLuint shaderID, GLenum status);
