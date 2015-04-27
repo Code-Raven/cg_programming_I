@@ -11,8 +11,9 @@
 *.userprefs
 
 # Build results
-!*.dll
 [Dd]ebug/*
+![Dd]ebug/glew32.dll
+![Dd]ebug/glfw3.dll
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
