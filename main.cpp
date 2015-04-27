@@ -47,8 +47,6 @@ int main(){
 	}
 
 	do{
-		//Update();
-		//Render();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
