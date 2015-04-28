@@ -6,6 +6,7 @@
 
 //GLM provides openGL mathematics.
 #include <glm/glm.hpp>
+#include "glm/gtc/matrix_transform.hpp"
 
 //Standard Headers…
 #include <stdio.h>
@@ -33,6 +34,9 @@ using namespace std; //If we want to print stuff
 #define ANTIALIASING 4  //nx antialiasing
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 768
+#define FIELD_OF_VIEW 45.0f
+#define Z_NEAR 0.1f
+#define Z_FAR 100.0f
 #define GLFW_FAIL 0 
 
 //External Globals…

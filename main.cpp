@@ -164,7 +164,7 @@ GLuint& LoadTriangle(){
 	return vertexBuffer;
 }
 
-void RenderVertex(GLuint vertexBuffer){
+mat4 RenderVertex(GLuint vertexBuffer, const vec3& position, const vec3& scale){
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 
@@ -176,20 +176,39 @@ void RenderVertex(GLuint vertexBuffer){
 		0,			//Stride...
 		(void*)0	//Array buffer offset...
 	);
+
+	mat4 identityMatrix = mat4(1.0f);
+	mat4 positionMatrix = translate(identityMatrix, position);
+	mat4 scaleMatrix = glm::scale(positionMatrix, scale);
+
+	return scaleMatrix;
 }
 
-void RenderQuad(GLuint vertexBuffer){
-	RenderVertex(vertexBuffer);
+mat4 RenderQuad(GLuint vertexBuffer, const vec3& position, const vec3& scale){
+	mat4 transformMatrix = RenderVertex(vertexBuffer, position, scale);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glDisableVertexAttribArray(0);
+
+	return transformMatrix;
 }
 
-void RenderTriangle(GLuint vertexBuffer){
-	RenderVertex(vertexBuffer);
+//void RenderTriangle(GLuint vertexBuffer){
+//	RenderVertex(vertexBuffer);
+//
+//	glDrawArrays(GL_TRIANGLES, 0, 3);
+//	glDisableVertexAttribArray(0);
+//}
 
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-	glDisableVertexAttribArray(0);
+float& getDeltaTime(){
+	static float lastTime = glfwGetTime();
+
+	float now = glfwGetTime();
+	float deltaTime = now - lastTime;
+
+	lastTime = now;
+
+	return deltaTime;
 }
 
 int main(){
@@ -204,18 +223,57 @@ int main(){
 	//Create and compile glsl program from shaders...
 	GLuint programID = LoadShaders("BasicVertexShader.vertexshader", "BasicFragmentShader.fragmentshader");
 
+	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
+
+	float aspectRatio = SCREEN_WIDTH/(float)SCREEN_HEIGHT;
+	mat4 projectionMatrix = perspective(FIELD_OF_VIEW, aspectRatio, Z_NEAR, Z_FAR);
+
 	GLuint triangleID = LoadTriangle();
 	GLuint quadID = LoadQuad();
+
+	glUseProgram(programID);
 
 	do{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glUseProgram(programID);
-		//RenderTriangle(triangleID);
-		RenderQuad(quadID);
+		//Getting delta time...
+		float deltaTime = getDeltaTime();
 
-		//Update();
-		//Render();
+		// Camera matrix
+		mat4 viewMatrix = lookAt(
+			vec3(0,0,3), // Camera is at (4,3,3), in World Space
+			vec3(0,0,0), // and looks at the origin
+			vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
+		);
+
+		//RenderTriangle(triangleID);
+
+		//Initializing position data...
+		static vec3 ballPosition = vec3(0);
+		static vec3 ballVelocity = vec3(1.0f, 0.0f, 0.0f);
+		ballPosition += ballVelocity * deltaTime;
+
+		if(ballPosition.x > 1.4f){
+			ballPosition.x = 1.4f;
+			ballVelocity.x = -ballVelocity.x;
+		}
+		else if(ballPosition.x < -1.4f){
+			ballPosition.x = -1.4f;
+			ballVelocity.x = -ballVelocity.x;
+		}
+
+
+		//Rendering ball...
+		mat4 MVPMatrix = projectionMatrix * viewMatrix * RenderQuad(quadID, ballPosition, vec3(0.05f));
+		glUniformMatrix4fv(MVPMatrixID, 1, GL_FALSE, &MVPMatrix[0][0]);
+
+		//Rendering paddles...
+		MVPMatrix = projectionMatrix * viewMatrix * RenderQuad(quadID, vec3(1.5f, 0.0f, 0.0f), vec3(0.08f, 0.5f, 1.0f));
+		glUniformMatrix4fv(MVPMatrixID, 1, GL_FALSE, &MVPMatrix[0][0]);
+
+		MVPMatrix = projectionMatrix * viewMatrix * RenderQuad(quadID, vec3(-1.5f, 0.0f, 0.0f), vec3(0.08f, 0.5f, 1.0f));
+		glUniformMatrix4fv(MVPMatrixID, 1, GL_FALSE, &MVPMatrix[0][0]);
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
