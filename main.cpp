@@ -164,7 +164,7 @@ GLuint& LoadTriangle(){
 	return vertexBuffer;
 }
 
-void RenderVertex(GLuint vertexBuffer){
+mat4 RenderVertex(GLuint vertexBuffer, const vec3& position){
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 
@@ -176,17 +176,22 @@ void RenderVertex(GLuint vertexBuffer){
 		0,			//Stride...
 		(void*)0	//Array buffer offset...
 	);
+
+	mat4 positionMatrix = translate(mat4(1.0f), position);
+	return positionMatrix;
 }
 
-void RenderQuad(GLuint vertexBuffer){
-	RenderVertex(vertexBuffer);
+mat4 RenderQuad(GLuint vertexBuffer, const vec3& position){
+	mat4 matrix = RenderVertex(vertexBuffer, position);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glDisableVertexAttribArray(0);
+
+	return matrix;
 }
 
 void RenderTriangle(GLuint vertexBuffer){
-	RenderVertex(vertexBuffer);
+	RenderVertex(vertexBuffer, vec3(0.0f, 0.0f, 0.0f));
 
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	glDisableVertexAttribArray(0);
@@ -204,15 +209,35 @@ int main(){
 	//Create and compile glsl program from shaders...
 	GLuint programID = LoadShaders("BasicVertexShader.vertexshader", "BasicFragmentShader.fragmentshader");
 
+	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
+
+	float aspectRatio = SCREEN_WIDTH/(float)SCREEN_HEIGHT;
+	mat4 Projection = perspective(FIELD_OF_VIEW, aspectRatio, Z_NEAR, Z_FAR);
+
 	GLuint triangleID = LoadTriangle();
 	GLuint quadID = LoadQuad();
 
 	do{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//buffer
 
 		glUseProgram(programID);
 		//RenderTriangle(triangleID);
-		RenderQuad(quadID);
+
+		// Camera matrix
+		glm::mat4 View = glm::lookAt(
+			glm::vec3(0,0,3), // Camera is at (4,3,3), in World Space
+			glm::vec3(0,0,0), // and looks at the origin
+			glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
+		);
+
+		// Model matrix : an identity matrix (model will be at the origin)
+		glm::mat4 Model      = glm::mat4(1.0f);  // Changes for each model !
+		// Our ModelViewProjection : multiplication of our 3 matrices
+		
+		glm::mat4 MVP = Projection * View * Model * RenderQuad(quadID, vec3( 0.0f, 0.0f, 0.0f));
+		// Remember, matrix multiplication is the other way around
+		// Send our transformation to the currently bound shader,
+		glUniformMatrix4fv(MVPMatrixID, 1, GL_FALSE, &MVP[0][0]);
 
 		//Update();
 		//Render();
