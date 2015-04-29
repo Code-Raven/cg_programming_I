@@ -3,6 +3,8 @@
 Paddle::Paddle() : Object(){
 	LoadTriangles(2, 0, GL_TRIANGLE_STRIP);
 	SetScale(vec3(0.025f, 0.25f, 1.0f));
+	upKey = NO_KEY;
+	downKey = NO_KEY;
 }
 
 Paddle::~Paddle(){

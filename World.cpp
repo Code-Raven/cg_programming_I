@@ -5,12 +5,20 @@ World::World(){
 	balls[0].SetVelocity(vec3(1.0f, 0.1f, 0.0f));
 	balls[0].SetPosition(vec3(0.0f, 0.0f, 0.0f));
 
-	paddles = new Paddle[numPaddles = 2];
-	paddles[0].SetPosition(vec3(1.5, 0, 0));
-	paddles[1].SetPosition(vec3(-1.5, 0, 0));
+	paddles = new Paddle[numPaddles = 4];
+
+	//Will move these paddles via user input...
+	paddles[0].SetPosition(vec3(1.5f, 0.0f, 0.0f));
+	paddles[1].SetPosition(vec3(-1.5f, 0.0f, 0.0f));
 
 	paddles[0].SetKeys(GLFW_KEY_UP, GLFW_KEY_DOWN); 
 	paddles[1].SetKeys(GLFW_KEY_W, GLFW_KEY_S); 
+
+	//Using these paddles to serve as upper and lower walls...
+	paddles[2].SetPosition(vec3(0.0f, 1.15f, 0.0f));
+	paddles[3].SetPosition(vec3(0.0f, -1.15f, 0.0f));
+	paddles[2].SetScale(vec3(1.45f, 0.025f, 1.0f));
+	paddles[3].SetScale(vec3(1.45f, 0.025f, 1.0f));
 }
 
 World::~World(){

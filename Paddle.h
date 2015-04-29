@@ -2,6 +2,8 @@
 
 #pragma once
 
+#define NO_KEY -2
+
 class Paddle : public Object{
 	
 	public:
