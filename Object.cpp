@@ -1,6 +1,7 @@
 #include "Object.h"
 
 Object::Object(){
+	objectState = NULL;
 	renderMode = GL_TRIANGLES;
 	vertexBufferID = 0;
 	SetPosition(vec3(0));
@@ -69,6 +70,19 @@ void Object::LoadTriangles(const GLuint& perRow, const GLuint& perColumn, const 
 	glGenBuffers(1, &vertexBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexBuffer), vertexBuffer, GL_STATIC_DRAW);
+}
+
+void Object::SaveObjectState(char *message){
+	if(objectState == NULL)
+		objectState = (Object*)malloc(sizeof(*this));
+
+	*objectState = *this;
+	puts(message);
+}
+
+void Object::LoadObjectState(char *message){
+	*this = *objectState;
+	puts(message);
 }
 
 mat4 Object::Render(){

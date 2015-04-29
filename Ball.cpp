@@ -13,15 +13,6 @@ Ball::~Ball(){
 void Ball::Update(const float& deltaTime){
 	position += velocity * deltaTime;
 
-	/*if(position.x > 1.5f){
-		position.x = 1.5f - (position.x - 1.5f);
-		velocity.x = -velocity.x;
-	}
-	else if(position.x < -1.5f){
-		position.x = -1.5f - (position.x + 1.5f);
-		velocity.x = -velocity.x;
-	}*/
-
 	Object::Update(deltaTime);
 }
 

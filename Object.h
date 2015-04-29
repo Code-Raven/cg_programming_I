@@ -20,9 +20,12 @@ class Object{
 		float GetTopY();
 		float GetBottomY();
 
+		void SaveObjectState(char *message = "Saved Object State");
+		void LoadObjectState(char *message = "Loaded Object State");
 		void LoadTriangles(const GLuint& perRow, const GLuint& perColumn, const GLenum& renderMode);
 
 	protected:
+		Object* objectState;
 		vec3 position, scale;
 
 	private:

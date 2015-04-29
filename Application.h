@@ -5,6 +5,7 @@
 #include <glfw3.h>
 
 //GLM provides openGL mathematics.
+#define GLM_FORCE_RADIANS	//Defining this before glm to ignore warnings we don't care about...
 #include <glm/glm.hpp>
 #include "glm/gtc/matrix_transform.hpp"
 
@@ -27,7 +28,6 @@ using namespace glm; //For openGL mathematics
 using namespace std; //If we want to print stuff
 
 //Defines…
-#define GLFW_DLL
 #define APP_NAME "<<Getting Started!>>"
 #define EXIT_WITH_ERROR -1
 #define EXIT_WITH_SUCCESS 0

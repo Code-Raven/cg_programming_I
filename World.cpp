@@ -19,6 +19,10 @@ World::World(){
 	paddles[3].SetPosition(vec3(0.0f, -1.15f, 0.0f));
 	paddles[2].SetScale(vec3(1.45f, 0.025f, 1.0f));
 	paddles[3].SetScale(vec3(1.45f, 0.025f, 1.0f));
+
+	SaveObjectStates();
+
+	resetKey = GLFW_KEY_SPACE;
 }
 
 World::~World(){
@@ -29,16 +33,49 @@ World::~World(){
 	balls = NULL;
 }
 
+void World::LoadObjectStates(){
+	for(GLuint i = 0; i < numBalls; ++i){
+		balls[i].LoadObjectState("Loaded Ball State!!!");
+	}
+	for(GLuint i = 0; i < numPaddles; ++i){
+		paddles[i].LoadObjectState("Loaded Paddle State!!!");
+	}
+}
+
+void World::SaveObjectStates(){
+	for(GLuint i = 0; i < numBalls; ++i){
+		balls[i].SaveObjectState("Saved Ball State!!!");
+	}
+	for(GLuint i = 0; i < numPaddles; ++i){
+		paddles[i].SaveObjectState("Saved Paddle State!!!");
+	}
+}
+
+void World::ResetWorld(){
+	static bool keyPressed = false;
+
+	if(!keyPressed && glfwGetKey(window, resetKey) == GLFW_PRESS){
+		LoadObjectStates();
+		keyPressed = true;
+	}
+	else if(keyPressed && glfwGetKey(window, resetKey) == GLFW_RELEASE){
+		keyPressed = false;
+	}
+}
+
 void World::Update(const float& deltaTime){
-	for(int i = 0; i < numBalls; ++i){
+
+	ResetWorld();
+
+	for(GLuint i = 0; i < numBalls; ++i){
 		balls[i].Update(deltaTime);
 	}
 
-	for(int i = 0; i < numPaddles; ++i){
+	for(GLuint i = 0; i < numPaddles; ++i){
 		paddles[i].Update(deltaTime);
 		
 		//HandleCollision...
-		for(int j = 0; j < numBalls; ++j){
+		for(GLuint j = 0; j < numBalls; ++j){
 			Paddle &paddle = paddles[i];
 			Ball &ball = balls[j];
 			
@@ -79,16 +116,19 @@ void World::Update(const float& deltaTime){
 
 				ball.SetPosition(revertedPos + lostVelocity);
 				ball.SetVelocity(reflectedVelocity * acceleration);
+
+				//Let's play a sound :)
+				printf("\a");
 			}
 		}
 	}
 }
 
 void World::Render(const Camera& camera){
-	for(int i = 0; i < numBalls; ++i){
+	for(GLuint i = 0; i < numBalls; ++i){
 		balls[i].Render(camera);
 	}
-	for(int i = 0; i < numPaddles; ++i){
+	for(GLuint i = 0; i < numPaddles; ++i){
 		paddles[i].Render(camera);
 	}
 }
