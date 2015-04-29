@@ -1,6 +1,14 @@
 #include "Application.h"
+#include "World.h"
+
+#pragma once
 
 GLFWwindow* window = NULL;
+
+void window_refresh_callback(GLFWwindow* window){
+	//world.Render(camera);
+	glfwSwapBuffers(window);
+}
 
 int InitWindowFailed(){
 	if(glfwInit() == GLFW_FAIL){
@@ -27,6 +35,9 @@ int InitWindowFailed(){
     
     //Ensure we can capture the escape key being pressed below.
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
+	
+	//glfwSetWindowFocusCallback(window, windowFocusCallback);
+	glfwSetWindowRefreshCallback(window, window_refresh_callback);
 
 	return EXIT_WITH_SUCCESS;
 }
@@ -126,85 +137,11 @@ int InitGlewFailed(){
 	return EXIT_WITH_SUCCESS;
 }
 
-GLuint& LoadQuad(){
+double getDeltaTime(){
+	static double lastTime = glfwGetTime();
 
-	static GLfloat g_vertex_buffer_data[] = {
-		0.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 0.0f,
-		1.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f
-	};
-
-	for(int i = 0, size = 18; i < size; ++i){
-		g_vertex_buffer_data[i] -= 0.5f;
-	}
-
-	GLuint vertexBuffer = 0;
-	glGenBuffers(1, &vertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
-
-	return vertexBuffer;
-}
-
-GLuint& LoadTriangle(){
-	static const GLfloat g_vertex_buffer_data[] = {
-		-1.0f, -1.0f, 0.0f,
-		1.0f, -1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f
-	};
-
-	GLuint vertexBuffer = 0;
-	glGenBuffers(1, &vertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
-
-	return vertexBuffer;
-}
-
-mat4 RenderVertex(GLuint vertexBuffer, const vec3& position, const vec3& scale){
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-
-	glVertexAttribPointer(
-		0,			//attribute layout
-		3,			//Elements in array
-		GL_FLOAT,	//Each element is of type float
-		GL_FALSE,	//Normalized?
-		0,			//Stride...
-		(void*)0	//Array buffer offset...
-	);
-
-	mat4 identityMatrix = mat4(1.0f);
-	mat4 positionMatrix = translate(identityMatrix, position);
-	mat4 scaleMatrix = glm::scale(positionMatrix, scale);
-
-	return scaleMatrix;
-}
-
-mat4 RenderQuad(GLuint vertexBuffer, const vec3& position, const vec3& scale){
-	mat4 transformMatrix = RenderVertex(vertexBuffer, position, scale);
-
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glDisableVertexAttribArray(0);
-
-	return transformMatrix;
-}
-
-//void RenderTriangle(GLuint vertexBuffer){
-//	RenderVertex(vertexBuffer);
-//
-//	glDrawArrays(GL_TRIANGLES, 0, 3);
-//	glDisableVertexAttribArray(0);
-//}
-
-float& getDeltaTime(){
-	static float lastTime = glfwGetTime();
-
-	float now = glfwGetTime();
-	float deltaTime = now - lastTime;
+	double now = glfwGetTime();
+	double deltaTime = now - lastTime;
 
 	lastTime = now;
 
@@ -222,16 +159,14 @@ int main(){
 
 	//Create and compile glsl program from shaders...
 	GLuint programID = LoadShaders("BasicVertexShader.vertexshader", "BasicFragmentShader.fragmentshader");
-
-	GLuint MVPMatrixID = glGetUniformLocation(programID, "MVP");
-
-	float aspectRatio = SCREEN_WIDTH/(float)SCREEN_HEIGHT;
-	mat4 projectionMatrix = perspective(FIELD_OF_VIEW, aspectRatio, Z_NEAR, Z_FAR);
-
-	GLuint triangleID = LoadTriangle();
-	GLuint quadID = LoadQuad();
-
 	glUseProgram(programID);
+
+	Camera camera;
+	float aspectRatio = SCREEN_WIDTH/(float)SCREEN_HEIGHT;
+	camera.MVPMatrixID = glGetUniformLocation(programID, "MVP");
+	camera.projectionMatrix = perspective(FIELD_OF_VIEW, aspectRatio, Z_NEAR, Z_FAR);
+
+	World world;
 
 	do{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -240,39 +175,14 @@ int main(){
 		float deltaTime = getDeltaTime();
 
 		// Camera matrix
-		mat4 viewMatrix = lookAt(
+		camera.viewMatrix = lookAt(
 			vec3(0,0,3), // Camera is at (4,3,3), in World Space
 			vec3(0,0,0), // and looks at the origin
 			vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
 		);
 
-		//RenderTriangle(triangleID);
-
-		//Initializing position data...
-		static vec3 ballPosition = vec3(0);
-		static vec3 ballVelocity = vec3(1.0f, 0.0f, 0.0f);
-		ballPosition += ballVelocity * deltaTime;
-
-		if(ballPosition.x > 1.4f){
-			ballPosition.x = 1.4f;
-			ballVelocity.x = -ballVelocity.x;
-		}
-		else if(ballPosition.x < -1.4f){
-			ballPosition.x = -1.4f;
-			ballVelocity.x = -ballVelocity.x;
-		}
-
-
-		//Rendering ball...
-		mat4 MVPMatrix = projectionMatrix * viewMatrix * RenderQuad(quadID, ballPosition, vec3(0.05f));
-		glUniformMatrix4fv(MVPMatrixID, 1, GL_FALSE, &MVPMatrix[0][0]);
-
-		//Rendering paddles...
-		MVPMatrix = projectionMatrix * viewMatrix * RenderQuad(quadID, vec3(1.5f, 0.0f, 0.0f), vec3(0.08f, 0.5f, 1.0f));
-		glUniformMatrix4fv(MVPMatrixID, 1, GL_FALSE, &MVPMatrix[0][0]);
-
-		MVPMatrix = projectionMatrix * viewMatrix * RenderQuad(quadID, vec3(-1.5f, 0.0f, 0.0f), vec3(0.08f, 0.5f, 1.0f));
-		glUniformMatrix4fv(MVPMatrixID, 1, GL_FALSE, &MVPMatrix[0][0]);
+		world.Update(deltaTime);
+		world.Render(camera);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

@@ -18,6 +18,7 @@
 #include <cmath>
 #include <fstream>
 #include <string>
+#include <functional>
 
 #pragma once
 
@@ -41,11 +42,8 @@ using namespace std; //If we want to print stuff
 
 //External Globals…
 extern GLFWwindow* window;
-extern GLint shaderStatus;
-extern bool activeRef;
 
-//int Load();
-//void Update();
-//void Render();
-
-//void CheckShaderStatus(GLuint shaderID, GLenum status);
+struct Camera{
+	GLuint MVPMatrixID;
+	mat4 projectionMatrix, viewMatrix, MVPMatrix;
+};
