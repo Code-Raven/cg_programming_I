@@ -105,6 +105,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Paddle.cpp" />
+    <ClCompile Include="Plane.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -112,6 +113,7 @@
     <ClInclude Include="Ball.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Paddle.h" />
+    <ClInclude Include="Plane.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>

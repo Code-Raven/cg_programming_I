@@ -1,22 +1,19 @@
 #include "Object.h"
+#include "Plane.h"
 #include "Ball.h"
 #include "Paddle.h"
+
+#pragma once
 
 class World{
 
 	public:
 		World();
-		~World();
+		virtual ~World();
 
-		void SaveObjectStates();
-		void LoadObjectStates();
-		void ResetWorld();
 		void Update(const float& deltaTime);
 		void Render(const Camera& camera);
 		
 	private:
-		int resetKey;
-		GLuint numBalls, numPaddles;
-		Ball* balls;
-		Paddle* paddles;
+		Plane* plane;
 };

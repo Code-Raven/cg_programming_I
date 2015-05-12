@@ -57,15 +57,30 @@ void Object::Render(const Camera& camera){
 
 void Object::LoadTriangles(const GLuint& perRow, const GLuint& perColumn, const GLenum& renderMode){
 
-	static const GLfloat vertexBuffer[] = {
-		-1.0f, 1.0f,  0.0f,
-		-1.0f,-1.0f, 0.0f,
-		1.0f, 1.0f,  0.0f,
-		1.0f, -1.0f, 0.0f
-	};
-	
-	numIndices = 4;
+	/*
+		0,1   1,1
+		0,0   1,0
 
+		0,0   1,0
+		0,-1  1,-1
+	*/
+	static const GLfloat vertexBuffer[] = {
+		0.0f, 1.0f,  0.0f,	//maps to index 0
+		0.0f, 0.0f, 0.0f,	//maps to index 1
+		1.0f, 1.0f,  0.0f,	//maps to index 2
+		1.0f, 0.0f, 0.0f,	//maps to index 3
+
+		1.0f, 0.0f, 0.0f,	//maps to index 4
+		0.0f, 0.0f, 0.0f,	//maps to index 5
+
+		0.0f, 0.0f, 0.0f,	//maps to index 6
+		0.0f, -1.0f, 0.0f,	//maps to index 7
+		1.0f, 0.0f, 0.0f,	//maps to index 8
+		1.0f, -1.0f, 0.0f	//maps to index 9
+	};
+
+	numIndices = 10;		//For a total of 10 indices
+	
 	this->renderMode = renderMode;
 	glGenBuffers(1, &vertexBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
