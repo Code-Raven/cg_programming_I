@@ -22,6 +22,7 @@ class Object{
 
 		void SaveObjectState(char *message = "Saved Object State");
 		void LoadObjectState(char *message = "Loaded Object State");
+		GLuint LoadBMP(const char * imagepath);
 		void LoadTriangles(const GLuint& perRow, const GLuint& perColumn, const GLenum& renderMode);
 
 	protected:

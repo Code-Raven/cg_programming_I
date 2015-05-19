@@ -5,6 +5,8 @@
 
 #pragma once
 
+#define LEVEL_0 "level_0.txt"
+
 class World{
 
 	public:
@@ -16,4 +18,7 @@ class World{
 		
 	private:
 		Plane* plane;
+		const char* loadedFile;
+		const char* loadedLevel;
+		unsigned char FindChar(const char* buffer, const char& c);
 };
