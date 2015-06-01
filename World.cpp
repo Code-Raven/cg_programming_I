@@ -1,5 +1,10 @@
 #include "World.h"
 
+namespace{
+	const u8 MAX_BUFFER_SIZE = 64;
+	const u8 MAX_PATH_SIZE = 32;
+}
+
 //TODO: Add functionality later...
 World::World(){
 	plane = new Plane(1, 1);
@@ -7,32 +12,43 @@ World::World(){
 	//load world...
 	ifstream myfile(LEVEL_0);
 
-	char buffer[256];
-	char* path = ;
+	char buffer[::MAX_BUFFER_SIZE];
+	char path[::MAX_PATH_SIZE];
 
 	if (myfile.is_open())
 	{
 		string line;
 		unsigned char len = 0;
 
+		bool loadLevelData = true;
+
 		while ( getline (myfile,line) )
 		{
 			line.copy(buffer, len = line.length());
 			buffer[len] = '\0';
 
-			if(buffer[0] == 35){
-				//TODO: get next count...
-				//count = buffer[1];
+			if(IS_EMPTY_LINE(buffer[0])){
 				continue;
 			}
+			else if(LOAD_TEXTURE(buffer[0])){
+				//Setting buffer size...
+				numTextures = ASCII_ZERO - buffer[1];
+				textureBuffer = (char*)malloc(MAX_PATH_SIZE * numTextures);
 
-			if(buffer[0] > 47 && buffer[0] < 58){
-				//TODO: add level data...
+				loadLevelData = false;
 				continue;
 			}
-			
-			if(buffer[0] == 32 || buffer[0] == '\0'){
-				//Empty line...
+			else if(LOAD_LEVELDATA(buffer[0])){
+				//Setting buffer size...
+				levelWidth = ASCII_ZERO - buffer[1];
+				levelHeight = ASCII_ZERO - buffer[3];
+				levelBuffer = (char*)malloc(MAX_BUFFER_SIZE * levelWidth * levelHeight);
+
+				loadLevelData = true;
+				continue;
+			}
+			else if(loadLevelData){
+				//TODO: Load level data here...
 				continue;
 			}
 
@@ -40,6 +56,7 @@ World::World(){
 
 			//Found textures...
 			if(commaLen > 0){
+				//strcpy_s(path, commaLen, buffer);
 				strcpy(path, buffer);
 				path[commaLen - 1] = '\0';
 				continue;
