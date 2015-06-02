@@ -7,6 +7,7 @@ Object::Object(){
 	SetPosition(vec3(0));
 	SetScale(vec3(1));
 	numIndices = 6;
+	textureID = NULL;
 }
 
 Object::~Object(){
@@ -187,7 +188,6 @@ GLuint Object::LoadBMP(const char * imagepath){
 	fclose(file);
 
 	// Create one OpenGL texture
-	GLuint textureID;
 	glGenTextures(1, &textureID);
  
 	// "Bind" the newly created texture : all future texture functions will modify this texture

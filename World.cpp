@@ -8,6 +8,7 @@ namespace{
 //TODO: Add functionality later...
 World::World(){
 	plane = new Plane(1, 1);
+	GLuint textureID = plane->LoadBMP("test.bmp");
 
 	//load world...
 	ifstream myfile(LEVEL_0);
