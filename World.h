@@ -28,7 +28,7 @@ class World{
 		
 	private:
 		Plane* plane;
-		const char* levelBuffer;
-		const char* textureBuffer;
+		u8* levelBuffer;
+		u8* textureBuffer;
 		u8 numTextures, levelWidth, levelHeight;
 };
