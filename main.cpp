@@ -168,8 +168,8 @@ int main(){
 
 	World world;
 
-	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-	//glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+	//Comment this in to render lines...
+	//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 	do{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

@@ -56,45 +56,7 @@ void Object::Render(const Camera& camera){
 	glUniformMatrix4fv(camera.MVPMatrixID, 1, GL_FALSE, &MVPMatrix[0][0]);
 }
 
-//bool loadTextureFromFile( std::string path )
-//{
-//    //Texture loading success
-//    bool textureLoaded = false;
-//
-//    //Generate and set current image ID
-//    ILuint imgID = 0;
-//    ilGenImages( 1, &imgID );
-//    ilBindImage( imgID );
-//
-//    //Load image
-//    ILboolean success = ilLoadImage( path.c_str() );
-//
-//    //Image loaded successfully
-//    if( success == IL_TRUE )
-//    {
-//        //Convert image to RGBA
-//        success = ilConvertImage( IL_RGBA, IL_UNSIGNED_BYTE );
-//        if( success == IL_TRUE )
-//        {
-//            //Create texture from file pixels
-//            textureLoaded = loadTextureFromPixels32( (GLuint*)ilGetData(), (GLuint)ilGetInteger( IL_IMAGE_WIDTH ), (GLuint)ilGetInteger( IL_IMAGE_HEIGHT ) );
-//        }
-//
-//        //Delete file from memory
-//        ilDeleteImages( 1, &imgID );
-//    }
-//
-//    //Report error
-//    if( !textureLoaded )
-//    {
-//        printf( "Unable to load %s\n", path.c_str() );
-//    }
-//
-//    return textureLoaded;
-//}
-
-void Object::LoadTriangles(const GLuint& perRow, const GLuint& perColumn, const GLenum& renderMode){
-
+void Object::BuildTriangles(const GLuint& perRow, const GLuint& perColumn){
 	/*
 		0,1   1,1
 		0,0   1,0
@@ -102,27 +64,43 @@ void Object::LoadTriangles(const GLuint& perRow, const GLuint& perColumn, const 
 		0,0   1,0
 		0,-1  1,-1
 	*/
-	static const GLfloat vertexBuffer[] = {
-		0.0f, 1.0f,  0.0f,	//maps to index 0
-		0.0f, 0.0f, 0.0f,	//maps to index 1
-		1.0f, 1.0f,  0.0f,	//maps to index 2
-		1.0f, 0.0f, 0.0f,	//maps to index 3
+	GLfloat *vertices = new GLfloat[18];
+	vertices[0] = 0.0f; vertices[1] = 1.0f; vertices[2] = 0.0f;
+	vertices[3] = 0.0f; vertices[4] = 0.0f; vertices[5] = 0.0f;
+	vertices[6] = 1.0f; vertices[7] = 1.0f; vertices[8] = 0.0f;
+	vertices[9] = 1.0f; vertices[10] = 0.0f; vertices[11] = 0.0f;
+	vertices[12] = 1.0f; vertices[13] = 1.0f; vertices[14] = 0.0f;
+	vertices[15] = 0.0f; vertices[16] = 0.0f; vertices[17] = 0.0f;
 
-		1.0f, 0.0f, 0.0f,	//maps to index 4
-		0.0f, 0.0f, 0.0f,	//maps to index 5
+	numIndices = 6;
+	this->renderMode = GL_TRIANGLES;
+	LoadTriangles(vertices, vertices);
+}
 
-		0.0f, 0.0f, 0.0f,	//maps to index 6
-		0.0f, -1.0f, 0.0f,	//maps to index 7
-		1.0f, 0.0f, 0.0f,	//maps to index 8
-		1.0f, -1.0f, 0.0f	//maps to index 9
-	};
+void Object::BuildTriangleStrip(const GLuint& perRow, const GLuint& perColumn){
+	GLfloat *vertices = new GLfloat[12];
+	vertices[0] = 0.0f; vertices[1] = 1.0f; vertices[2] = 0.0f;
+	vertices[3] = 0.0f; vertices[4] = 0.0f; vertices[5] = 0.0f;
+	vertices[6] = 1.0f; vertices[7] = 1.0f; vertices[8] = 0.0f;
+	vertices[9] = 1.0f; vertices[10] = 0.0f; vertices[11] = 0.0f;
 
-	numIndices = 10;		//For a total of 10 indices
-	
-	this->renderMode = renderMode;
+	//1.0f, 0.0f, 0.0f,	//maps to index 4
+	//0.0f, 0.0f, 0.0f,	//maps to index 5
+
+	//0.0f, 0.0f, 0.0f,	//maps to index 6
+	//0.0f, -1.0f, 0.0f,//maps to index 7
+	//1.0f, 0.0f, 0.0f,	//maps to index 8
+	//1.0f, -1.0f, 0.0f	//maps to index 9
+
+	numIndices = 4;
+	this->renderMode = GL_TRIANGLE_STRIP;
+	LoadTriangles(vertices, vertices);
+}
+
+void Object::LoadTriangles(GLfloat *vertices, GLfloat *uvs){
 	glGenBuffers(1, &vertexBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexBuffer), vertexBuffer, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, numIndices * 3 * sizeof(GLfloat), vertices, GL_STATIC_DRAW);
 }
 
 void Object::SaveObjectState(char *message){
