@@ -57,42 +57,70 @@ void Object::Render(const Camera& camera){
 }
 
 void Object::BuildTriangles(const GLuint& perRow, const GLuint& perColumn){
-	/*
-		0,1   1,1
-		0,0   1,0
+	int numValuesPerRow = 18 * perRow;
+	int numValues = 18 * perRow * perColumn;
 
-		0,0   1,0
-		0,-1  1,-1
-	*/
-	GLfloat *vertices = new GLfloat[18];
-	vertices[0] = 0.0f; vertices[1] = 1.0f; vertices[2] = 0.0f;
-	vertices[3] = 0.0f; vertices[4] = 0.0f; vertices[5] = 0.0f;
-	vertices[6] = 1.0f; vertices[7] = 1.0f; vertices[8] = 0.0f;
-	vertices[9] = 1.0f; vertices[10] = 0.0f; vertices[11] = 0.0f;
-	vertices[12] = 1.0f; vertices[13] = 1.0f; vertices[14] = 0.0f;
-	vertices[15] = 0.0f; vertices[16] = 0.0f; vertices[17] = 0.0f;
+	GLfloat *vertices = new GLfloat[numValues];
+	for(int i = 0, x = 0, y = 0; i < numValues; ++x){
+		vertices[i] = x;		vertices[++i] = y + 1;	vertices[++i] = 0;
+		vertices[++i] = x;		vertices[++i] = y;		vertices[++i] = 0;
+		vertices[++i] = x + 1;	vertices[++i] = y + 1;	vertices[++i] = 0;
+		
+		vertices[++i] = x + 1;	vertices[++i] = y;		vertices[++i] = 0;
+		vertices[++i] = x + 1;	vertices[++i] = y + 1;	vertices[++i] = 0;
+		vertices[++i] = x;		vertices[++i] = y;		vertices[++i] = 0;
 
-	numIndices = 6;
+		if(++i % numValuesPerRow == 0){
+			x = -1; --y;
+		}
+	}
+
+	numIndices = numValues/3;
 	this->renderMode = GL_TRIANGLES;
 	LoadTriangles(vertices, vertices);
 }
 
 void Object::BuildTriangleStrip(const GLuint& perRow, const GLuint& perColumn){
-	GLfloat *vertices = new GLfloat[12];
+	/*
+		0, 1	1, 1	|	2, 1	3, 1
+		0, 0	1, 0	|	2, 0	3, 0
+						|
+		0, 0	1, 0	|	2, 0 	3, 0
+		0,-1	1,-1	|	2,-1	3,-1
+	*/
+
+	int numValuesPerRow = (2 + (2 * perRow)) *3, numDegenValues = 2 * 3;
+	uint numValues = (numValuesPerRow + numDegenValues) * perColumn;
+
+	GLfloat *vertices = new GLfloat[numValues];
+	for(int i = 0, x = 0, y = 0; i < numValues; ++x){
+		vertices[i] = x;		vertices[++i] = y + 1;	vertices[++i] = 0;
+		vertices[++i] = x;		vertices[++i] = y;		vertices[++i] = 0;
+
+		if((++i) % numValuesPerRow == 0){
+			vertices[i] = x;	vertices[++i] = y;	vertices[++i] = 0;
+			vertices[++i] = x;		vertices[++i] = y;	vertices[++i] = 0;
+			numValuesPerRow += numDegenValues;
+			i +=1;
+			x = -1; --y;
+		}
+	}
+
+	/*GLfloat *vertices = new GLfloat[numVertices];
 	vertices[0] = 0.0f; vertices[1] = 1.0f; vertices[2] = 0.0f;
 	vertices[3] = 0.0f; vertices[4] = 0.0f; vertices[5] = 0.0f;
 	vertices[6] = 1.0f; vertices[7] = 1.0f; vertices[8] = 0.0f;
 	vertices[9] = 1.0f; vertices[10] = 0.0f; vertices[11] = 0.0f;
 
-	//1.0f, 0.0f, 0.0f,	//maps to index 4
-	//0.0f, 0.0f, 0.0f,	//maps to index 5
+	vertices[12] = 1.0f; vertices[13] = 0.0f; vertices[14] = 0.0f;
+	vertices[15] = 1.0f; vertices[16] = 0.0f; vertices[17] = 0.0f;
 
-	//0.0f, 0.0f, 0.0f,	//maps to index 6
-	//0.0f, -1.0f, 0.0f,//maps to index 7
-	//1.0f, 0.0f, 0.0f,	//maps to index 8
-	//1.0f, -1.0f, 0.0f	//maps to index 9
+	vertices[18] = 0.0f; vertices[19] = 0.0f; vertices[20] = 0.0f;
+	vertices[21] = 0.0f; vertices[22] = -1.0f; vertices[23] = 0.0f;
+	vertices[24] = 1.0f; vertices[25] = 0.0f; vertices[26] = 0.0f;
+	vertices[27] = 1.0f; vertices[28] = -1.0f; vertices[29] = 0.0f;*/
 
-	numIndices = 4;
+	numIndices = numValues/3;
 	this->renderMode = GL_TRIANGLE_STRIP;
 	LoadTriangles(vertices, vertices);
 }
