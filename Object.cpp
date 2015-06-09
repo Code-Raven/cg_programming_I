@@ -7,7 +7,8 @@ Object::Object(){
 	SetPosition(vec3(0));
 	SetScale(vec3(1));
 	numIndices = 6;
-	textureID = NULL;
+	numUVs = 0;
+	textureID = 0;
 }
 
 Object::~Object(){
@@ -75,9 +76,27 @@ void Object::BuildTriangles(const GLuint& perRow, const GLuint& perColumn){
 		}
 	}
 
+	/*
+		0, 1	1, 1
+
+
+		0, 0	1, 0
+	*/
+
+	int numUvValues = 12;
+
+	GLfloat *uvs = new GLfloat[12];
+	uvs[0] = 0;		uvs[1] = 0;
+	uvs[2] = 0;		uvs[3] = 1;
+	uvs[4] = 1;		uvs[5] = 0;
+	uvs[6] = 1;		uvs[7] = 1;
+	uvs[8] = 1;		uvs[9] = 0;
+	uvs[10] = 0;	uvs[11] = 1;
+
+	numUVs = numUvValues/2;
 	numIndices = numValues/3;
 	this->renderMode = GL_TRIANGLES;
-	LoadTriangles(vertices, vertices);
+	LoadTriangles(vertices, uvs);
 }
 
 void Object::BuildTriangleStrip(const GLuint& perRow, const GLuint& perColumn){
@@ -129,6 +148,10 @@ void Object::LoadTriangles(GLfloat *vertices, GLfloat *uvs){
 	glGenBuffers(1, &vertexBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
 	glBufferData(GL_ARRAY_BUFFER, numIndices * 3 * sizeof(GLfloat), vertices, GL_STATIC_DRAW);
+
+	glGenBuffers(1, &uvID);
+	glBindBuffer(GL_ARRAY_BUFFER, uvID);
+	glBufferData(GL_ARRAY_BUFFER, numUVs * 2 * sizeof(GLfloat), uvs, GL_STATIC_DRAW);
 }
 
 void Object::SaveObjectState(char *message){
@@ -221,8 +244,23 @@ mat4 Object::Render(){
 		(void*)0	//Array buffer offset...
 	);
 
+	//Rendering UVs...
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, uvID);
+
+	glVertexAttribPointer(
+		1,			//attribute layout
+		2,			//Elements in array
+		GL_FLOAT,	//Each element is of type float
+		GL_FALSE,	//Normalized?
+		0,			//Stride...
+		(void*)0	//Array buffer offset...
+	);
+
 	glDrawArrays(renderMode, 0, numIndices);	//GL_TRIANGLE_STRIP or GL_TRIANGLES
+
 	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
 
 	//Every object starts off with an identity matrix...
 	/*mat4 objectMatrix = mat4(1.0f);

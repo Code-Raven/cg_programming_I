@@ -34,6 +34,6 @@ class Object{
 		void LoadTriangles(GLfloat *vertices, GLfloat *uvs);
 		float leftX, rightX, topY, bottomY;
 		mat4 Render();
-		GLuint textureID;
-		GLuint numIndices, vertexBufferID, renderMode;
+		GLuint textureID, uvID;
+		GLuint numIndices, numUVs, vertexBufferID, renderMode;
 };
