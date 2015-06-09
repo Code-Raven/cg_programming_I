@@ -76,22 +76,23 @@ void Object::BuildTriangles(const GLuint& perRow, const GLuint& perColumn){
 		}
 	}
 
-	/*
-		0, 1	1, 1
+	int numUvValuesPerRow = 12 * perRow;
+	int numUvValues = 12 * perRow * perColumn;
 
+	GLfloat *uvs = new GLfloat[numUvValues];
+	for(int i = 0, u = 0, v = 0; i < numUvValues; ++u){
+		uvs[i] = u;			uvs[++i] = -v;
+		uvs[++i] = u;	uvs[++i] = -v - 1;
+		uvs[++i] = u + 1;		uvs[++i] = -v;
+		
+		uvs[++i] = u + 1;	uvs[++i] = -v - 1;
+		uvs[++i] = u + 1;		uvs[++i] = -v;
+		uvs[++i] = u;	uvs[++i] = -v - 1;
 
-		0, 0	1, 0
-	*/
-
-	int numUvValues = 12;
-
-	GLfloat *uvs = new GLfloat[12];
-	uvs[0] = 0;		uvs[1] = 0;
-	uvs[2] = 0;		uvs[3] = 1;
-	uvs[4] = 1;		uvs[5] = 0;
-	uvs[6] = 1;		uvs[7] = 1;
-	uvs[8] = 1;		uvs[9] = 0;
-	uvs[10] = 0;	uvs[11] = 1;
+		if(++i % numUvValuesPerRow == 0){
+			u = -1; ++v;
+		}
+	}
 
 	numUVs = numUvValues/2;
 	numIndices = numValues/3;
