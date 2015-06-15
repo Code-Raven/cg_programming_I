@@ -1,8 +1,8 @@
 #include "Ball.h"
 
 Ball::Ball() : Object(){
-	BuildTriangles(2, 0);
-	//BuildTriangleStrip(2, 0);
+	BuildTriangles(1, 1, false);
+	//BuildTriangleStrip(1, 1, false);
 	SetScale(vec3(0.025f));
 	SetVelocity(vec3(1.0f, 0.0f, 0.0f));
 }

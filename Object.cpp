@@ -57,41 +57,41 @@ void Object::Render(const Camera& camera){
 	glUniformMatrix4fv(camera.MVPMatrixID, 1, GL_FALSE, &MVPMatrix[0][0]);
 }
 
-void Object::BuildTriangles(const GLuint& perRow, const GLuint& perColumn){
+void Object::BuildTriangles(const GLuint& perRow, const GLuint& perColumn, bool tileUVs){
 	int numValuesPerRow = 18 * perRow;
 	int numValues = 18 * perRow * perColumn;
 
+	int numUvValues = 12 * perRow * perColumn;
+	GLfloat *uvs = new GLfloat[numUvValues];
+
+	GLfloat recipX = 1.0f, recipY =1.0f;
+	if(!tileUVs){
+		recipX /= perRow;
+		recipY /= perColumn;
+	}
+
 	GLfloat *vertices = new GLfloat[numValues];
-	for(int i = 0, x = 0, y = 0; i < numValues; ++x){
-		vertices[i] = x;		vertices[++i] = y + 1;	vertices[++i] = 0;
-		vertices[++i] = x;		vertices[++i] = y;		vertices[++i] = 0;
-		vertices[++i] = x + 1;	vertices[++i] = y + 1;	vertices[++i] = 0;
+	for(int i = 0, j = 0, x = 0, y = 0; i < numValues; ++x, ++j){
+		vertices[i] = x;			vertices[++i] = (y + 1);	vertices[++i] = 0;
+		vertices[++i] = x;			vertices[++i] = y;			vertices[++i] = 0;
+		vertices[++i] = (x + 1);	vertices[++i] = (y + 1);	vertices[++i] = 0;
 		
-		vertices[++i] = x + 1;	vertices[++i] = y;		vertices[++i] = 0;
-		vertices[++i] = x + 1;	vertices[++i] = y + 1;	vertices[++i] = 0;
-		vertices[++i] = x;		vertices[++i] = y;		vertices[++i] = 0;
+		vertices[++i] = (x + 1);	vertices[++i] = y;			vertices[++i] = 0;
+		vertices[++i] = (x + 1);	vertices[++i] = (y + 1);	vertices[++i] = 0;
+		vertices[++i] = x;			vertices[++i] = y;			vertices[++i] = 0;
+
+		uvs[j] = x * recipX;			uvs[++j] = y * recipY;
+		uvs[++j] = x * recipX;			uvs[++j] = (y + 1) * recipY;
+		uvs[++j] = (x + 1) * recipX;	uvs[++j] = y * recipY;
+
+		uvs[++j] = (x + 1) * recipX;	uvs[++j] = (y + 1) * recipY;
+		uvs[++j] = (x + 1) * recipX;	uvs[++j] = y * recipY;
+		uvs[++j] = x * recipX;			uvs[++j] = (y + 1) * recipY;
 
 		if(++i % numValuesPerRow == 0){
 			x = -1; --y;
 		}
 	}
-
-	/*
-		0, 1	1, 1
-
-
-		0, 0	1, 0
-	*/
-
-	int numUvValues = 12;
-
-	GLfloat *uvs = new GLfloat[12];
-	uvs[0] = 0;		uvs[1] = 0;
-	uvs[2] = 0;		uvs[3] = 1;
-	uvs[4] = 1;		uvs[5] = 0;
-	uvs[6] = 1;		uvs[7] = 1;
-	uvs[8] = 1;		uvs[9] = 0;
-	uvs[10] = 0;	uvs[11] = 1;
 
 	numUVs = numUvValues/2;
 	numIndices = numValues/3;
@@ -99,7 +99,7 @@ void Object::BuildTriangles(const GLuint& perRow, const GLuint& perColumn){
 	LoadTriangles(vertices, uvs);
 }
 
-void Object::BuildTriangleStrip(const GLuint& perRow, const GLuint& perColumn){
+void Object::BuildTriangleStrip(const GLuint& perRow, const GLuint& perColumn, bool tileUvs){
 	/*
 		0, 1	1, 1	|	2, 1	3, 1
 		0, 0	1, 0	|	2, 0	3, 0
@@ -125,7 +125,7 @@ void Object::BuildTriangleStrip(const GLuint& perRow, const GLuint& perColumn){
 		}
 	}
 
-	/*GLfloat *vertices = new GLfloat[numVertices];
+	/*GLfloat *vertices = new GLfloat[numValues];
 	vertices[0] = 0.0f; vertices[1] = 1.0f; vertices[2] = 0.0f;
 	vertices[3] = 0.0f; vertices[4] = 0.0f; vertices[5] = 0.0f;
 	vertices[6] = 1.0f; vertices[7] = 1.0f; vertices[8] = 0.0f;
@@ -139,9 +139,27 @@ void Object::BuildTriangleStrip(const GLuint& perRow, const GLuint& perColumn){
 	vertices[24] = 1.0f; vertices[25] = 0.0f; vertices[26] = 0.0f;
 	vertices[27] = 1.0f; vertices[28] = -1.0f; vertices[29] = 0.0f;*/
 
+	/*
+		0, 1	1, 1
+
+
+		0, 0	1, 0
+	*/
+
+	int numUvValues = 12;
+
+	GLfloat *uvs = new GLfloat[12];
+	uvs[0] = 0;		uvs[1] = 0;
+	uvs[2] = 0;		uvs[3] = 1;
+	uvs[4] = 1;		uvs[5] = 0;
+	uvs[6] = 1;		uvs[7] = 1;
+	uvs[8] = 1;		uvs[9] = 0;
+	uvs[10] = 0;	uvs[11] = 1;
+
+	numUVs = numUvValues/2;
 	numIndices = numValues/3;
 	this->renderMode = GL_TRIANGLE_STRIP;
-	LoadTriangles(vertices, vertices);
+	LoadTriangles(vertices, uvs);
 }
 
 void Object::LoadTriangles(GLfloat *vertices, GLfloat *uvs){

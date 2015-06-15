@@ -26,8 +26,9 @@ static void FillBuffer(u8 *src, u8 *dest, u16 &index, u16 const &length){
 
 //TODO: Add functionality later...
 World::World(){
-	plane = new Plane(1, 1);
+	plane = new Plane(3, 3);
 	plane->SetScale(vec3(1.0f));
+	plane->SetPosition(vec3(-1.0f, 0.0f, 0.0f));
 	//GLuint textureID = plane->LoadBMP("test.bmp");
 	GLuint textureID = plane->LoadBMP("dirt.bmp");
 

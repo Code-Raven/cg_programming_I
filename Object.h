@@ -25,8 +25,8 @@ class Object{
 		GLuint LoadBMP(const char * imagepath);
 
 	protected:
-		void BuildTriangles(const GLuint& perRow, const GLuint& perColumn);
-		void BuildTriangleStrip(const GLuint& perRow, const GLuint& perColumn);
+		void BuildTriangles(const GLuint& perRow, const GLuint& perColumn, bool tileUvs);
+		void BuildTriangleStrip(const GLuint& perRow, const GLuint& perColumn, bool tileUvs);
 		Object* objectState;
 		vec3 position, scale;
 
