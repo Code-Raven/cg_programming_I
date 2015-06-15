@@ -158,7 +158,8 @@ int main(){
 	glBindVertexArray(vertexArrayID);
 
 	//Create and compile glsl program from shaders...
-	GLuint programID = LoadShaders("TexturedVertexShader.vertexshader", "TexturedFragmentShader.fragmentshader");
+	//GLuint programID = LoadShaders("TexturedVertexShader.vertexshader", "TexturedFragmentShader.fragmentshader");
+	GLuint programID = LoadShaders("BasicVertexShader.vertexshader", "BasicFragmentShader.fragmentshader");
 	glUseProgram(programID);
 
 	Camera camera;
@@ -169,7 +170,7 @@ int main(){
 	World world;
 
 	//Comment this in to render lines...
-	//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 	do{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

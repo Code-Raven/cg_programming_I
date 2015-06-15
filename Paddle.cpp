@@ -1,8 +1,8 @@
 #include "Paddle.h"
 
 Paddle::Paddle() : Object(){
-	BuildTriangles(2, 1, false);
-	//BuildTriangleStrip(2, 1, false);
+	//BuildTriangles(2, 1, false);
+	BuildTriangleStrip(2, 1, false);
 	SetScale(vec3(0.025f, 0.25f, 1.0f));
 	upKey = NO_KEY;
 	downKey = NO_KEY;
