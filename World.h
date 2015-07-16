@@ -2,6 +2,7 @@
 #include "Plane.h"
 #include "Ball.h"
 #include "Paddle.h"
+#include "Cube.h"
 
 #pragma once
 
@@ -28,6 +29,7 @@ class World{
 		
 	private:
 		Plane* plane;
+		Cube* cube;
 		u8* levelBuffer;
 		u8* textureBuffer;
 		u8 numTextures, levelWidth, levelHeight;

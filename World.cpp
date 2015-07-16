@@ -26,10 +26,17 @@ static void FillBuffer(u8 *src, u8 *dest, u16 &index, u16 const &length){
 
 //TODO: Add functionality later...
 World::World(){
-	plane = new Plane(5, 3);
-	plane->SetScale(vec3(1.0f));
-	GLuint textureID = plane->LoadBMP("test.bmp");
+	plane = new Plane(1, 1);
+	//plane->SetScale(vec3(0.15f));
+	//plane->SetPosition(vec3(-1.0f, -1.0f, 0.0f));
+
+	cube = new Cube();
+	cube->SetScale(vec3(0.5f));
+	cube->SetPosition(vec3(-2.0f, -2.0f, 0.0f));
+
+	//GLuint textureID = plane->LoadBMP("test.bmp");
 	//GLuint textureID = plane->LoadBMP("dirt.bmp");
+	GLuint textureID = plane->LoadBMP("world.bmp");
 
 	//load world...
 	ifstream myfile(LEVEL_0);
@@ -127,15 +134,20 @@ unsigned char World::FindChar(const char* buffer, const char& c){
 
 //TODO: Add functionality later...
 World::~World(){
-	delete plane;
-	plane = NULL;
+	//delete plane;
+	//plane = NULL;
+
+	delete cube;
+	cube = NULL;
 }
 
 void World::Update(const float& deltaTime){
 
-	plane->Update(deltaTime);
+	//plane->Update(deltaTime);
+	cube->Update(deltaTime);
 }
 
 void World::Render(const Camera& camera){
-	plane->Render(camera);
+	//plane->Render(camera);
+	cube->Render(camera);
 }

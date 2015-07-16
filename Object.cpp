@@ -9,6 +9,7 @@ Object::Object(){
 	numIndices = 6;
 	numUVs = 0;
 	textureID = 0;
+	rotSpeed = 0;
 }
 
 Object::~Object(){
@@ -48,6 +49,7 @@ void Object::Update(const float& deltaTime){
 	rightX = position.x + scale.x;
 	topY = position.y + scale.y;
 	bottomY = position.y - scale.y;
+	rotAngle += rotSpeed * deltaTime;
 }
 
 void Object::Render(const Camera& camera){
@@ -81,18 +83,27 @@ void Object::BuildTriangles(const GLuint& perRow, const GLuint& perColumn){
 
 	GLfloat *uvs = new GLfloat[numUvValues];
 	for(int i = 0, u = 0, v = 0; i < numUvValues; ++u){
-		uvs[i] = u;			uvs[++i] = -v;
-		uvs[++i] = u;	uvs[++i] = -v - 1;
-		uvs[++i] = u + 1;		uvs[++i] = -v;
+		uvs[i] = u + 0.625f;	uvs[++i] = -v - 0.9166;
+		uvs[++i] = u + 0.625f;	uvs[++i] = -v - 1;
+		uvs[++i] = u + 0.6875f;		uvs[++i] = -v - 0.9166;
 		
-		uvs[++i] = u + 1;	uvs[++i] = -v - 1;
-		uvs[++i] = u + 1;		uvs[++i] = -v;
-		uvs[++i] = u;	uvs[++i] = -v - 1;
+		uvs[++i] = u + 0.6875f;		uvs[++i] = -v - 1;
+		uvs[++i] = u + 0.6875f;		uvs[++i] = -v - 0.9166;
+		uvs[++i] = u + 0.625f;	uvs[++i] = -v - 1;
 
 		if(++i % numUvValuesPerRow == 0){
 			u = -1; ++v;
 		}
 	}
+
+	//0,1	
+	//0,0	
+
+	//U: 0.625 - 0.0625			0.625
+	//V: 1 - 0.0833				0.625 - 0.0833	
+
+	//U: 0.625 - 0.0625			0.625
+	//V: 1						1 		
 
 	numUVs = numUvValues/2;
 	numIndices = numValues/3;
@@ -268,9 +279,17 @@ mat4 Object::Render(){
 	mat4 identityMatrix = glm::scale(objectMatrix, scale);	
 	mat4 modelMatrix = translate(identityMatrix, position);*/
 
-	mat4 identityMatrix = mat4(1.0f);
-	mat4 translateMatrix = translate(identityMatrix, position);
-	mat4 modelMatrix = glm::scale(translateMatrix, scale);
+	mat4 identityMatrix = mat4(1.0f);	//model in object space
+	mat4 scaleMatrix = glm::scale(identityMatrix, scale);
+
+	/*mat4 translateMatrix = glm::translate(scaleMatrix, position);
+	mat4 modelMatrix = glm::rotate(translateMatrix, rotAngle, vec3(0.0f, 1.0f, 0.0f));
+*/
+	mat4 translateMatrix = glm::translate(identityMatrix, position);
+	mat4 rotationMatrix = glm::rotate(identityMatrix, rotAngle, vec3(0.0f, 1.0f, 0.0f));
+	mat4 modelMatrix = translateMatrix * rotationMatrix * scaleMatrix * identityMatrix;
+
+	//(model in world space) = translateMatrix * scale * (model in object space)
 
 	return modelMatrix;
 }
